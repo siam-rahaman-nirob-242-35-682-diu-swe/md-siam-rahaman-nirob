@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { GlowCard } from "@/components/fx/GlowCard";
 
 /** Monospace ASCII flow diagram — presentational only. */
@@ -187,6 +188,118 @@ export function SystemMeta() {
           <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{k}</div>
           <div className="mt-1.5 font-mono text-xs uppercase tracking-wider text-foreground">{v}</div>
         </div>
+      ))}
+    </div>
+  );
+}
+
+/** Lightweight, keyboard-accessible vertical flow diagram (INPUT → LOGIC → OUTPUT). */
+export function FlowDiagram({
+  title,
+  steps,
+  dense = false,
+}: {
+  title?: string;
+  steps: string[];
+  dense?: boolean;
+}) {
+  return (
+    <figure className="rounded-xl border border-border bg-surface/50 p-4 sm:p-5">
+      {title ? <figcaption className="mono-label">{title}</figcaption> : null}
+      <ol className={`${title ? "mt-4" : ""} space-y-0`}>
+        {steps.map((s, i) => (
+          <li key={s}>
+            <div
+              tabIndex={0}
+              className={`group rounded-lg border border-border bg-surface-2/60 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-muted-foreground outline-none transition-colors hover:border-primary/50 hover:text-foreground focus-visible:border-primary focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-ring ${
+                dense ? "" : "sm:text-xs"
+              }`}
+            >
+              <span className="mr-2 text-primary">{String(i + 1).padStart(2, "0")}</span>
+              <span className="break-words">{s}</span>
+            </div>
+            {i < steps.length - 1 ? (
+              <div aria-hidden className="flex justify-center py-1 text-primary/70">
+                <span className="font-mono text-[11px]">↓</span>
+              </div>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+    </figure>
+  );
+}
+
+const PHILOSOPHY_STEPS: { key: string; body: string }[] = [
+  { key: "OBSERVE", body: "Watch how the system actually behaves before assuming how it works." },
+  { key: "BREAK", body: "Isolate the failing part on purpose — in a lab, not in production." },
+  { key: "BUILD", body: "Write the smallest working solution that removes the manual step." },
+  { key: "TEST", body: "Repeat the run until behaviour is stable, not just once-lucky." },
+  { key: "DOCUMENT", body: "Write the procedure down so the result is repeatable from notes." },
+];
+
+/** Interactive OBSERVE → BREAK → BUILD → TEST → DOCUMENT workflow. */
+export function PhilosophyWorkflow() {
+  const [active, setActive] = useState(0);
+  const current = PHILOSOPHY_STEPS[active]!;
+  return (
+    <GlowCard className="h-full p-6 sm:p-7">
+      <span className="mono-label">Engineering workflow</span>
+      <div role="tablist" aria-label="Engineering workflow steps" className="mt-4 flex flex-wrap gap-2">
+        {PHILOSOPHY_STEPS.map((s, i) => (
+          <button
+            key={s.key}
+            role="tab"
+            aria-selected={active === i}
+            onClick={() => setActive(i)}
+            className={`min-h-9 rounded-full border px-3 py-1.5 font-mono text-[11px] tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              active === i
+                ? "border-primary/60 bg-primary/15 text-primary"
+                : "border-border bg-secondary/50 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {s.key}
+          </button>
+        ))}
+      </div>
+      <div className="mt-5 rounded-xl border border-border bg-surface/50 p-4">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary">{current.key}</div>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{current.body}</p>
+      </div>
+    </GlowCard>
+  );
+}
+
+/** Skill → existing evidence mapping. Clicking a skill jumps to the matching evidence. */
+export function SkillProofMap({
+  onSelect,
+}: {
+  onSelect: (evidence: string) => void;
+}) {
+  const MAP: { skill: string; evidence: string }[] = [
+    { skill: "C++", evidence: "Automated Car Parking System" },
+    { skill: "Arduino", evidence: "Automated Car Parking System" },
+    { skill: "Linux / Ubuntu", evidence: "Triple-Boot Security Lab" },
+    { skill: "Kali Linux", evidence: "Triple-Boot Security Lab" },
+    { skill: "Bash automation", evidence: "Triple-Boot Security Lab" },
+    { skill: "SQL / Databases", evidence: "ShopNest" },
+    { skill: "JWT / Access control", evidence: "ShopNest" },
+    { skill: "IT Support", evidence: "Operations Experience" },
+  ];
+  return (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {MAP.map((m) => (
+        <button
+          key={m.skill}
+          onClick={() => onSelect(m.evidence)}
+          className="group flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-surface/50 px-4 py-3 text-left transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="font-mono text-xs text-foreground">{m.skill}</span>
+          <span className="flex items-center gap-2 text-right font-mono text-[11px] text-muted-foreground group-hover:text-primary">
+            <span aria-hidden>→</span>
+            {m.evidence}
+          </span>
+        </button>
       ))}
     </div>
   );

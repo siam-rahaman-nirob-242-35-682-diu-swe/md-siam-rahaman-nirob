@@ -20,9 +20,12 @@ import {
   EvidenceStrip,
   ProofOfWork,
   SystemMeta,
+  FlowDiagram,
+  PhilosophyWorkflow,
+  SkillProofMap,
 } from "@/components/site/Sections";
 
-const SITE_URL = "https://portfolio-dynamo-07.lovable.app";
+const SITE_URL = "https://md-siam-rahaman-nirob.lovable.app";
 const CV_URL = "/Muhammad-Siam-Rahaman-Nirob-CV.pdf";
 const GITHUB_UNI = "https://github.com/siam-rahaman-nirob-242-35-682-diu-swe";
 const GITHUB = "https://github.com/Nirob682";
@@ -605,12 +608,14 @@ const certs = [
 
 const CASE_TABS = [
   "Overview",
+  "How it works",
   "Architecture",
   "Tech Stack",
+  "Contribution",
   "Engineering Decisions",
   "Challenges",
   "Solution",
-  "Future",
+  "Lessons & Next",
 ] as const;
 type CaseTab = (typeof CASE_TABS)[number];
 
@@ -718,17 +723,21 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
           {tab === "Architecture" ? (
             <>
               <Block label="How it is put together">{project.architecture}</Block>
-              <div className="rounded-xl border border-border bg-surface/50 p-5 font-mono text-xs leading-relaxed text-muted-foreground">
-                {project.architectureFlow.map((line, i) => (
-                  <div key={line} className="flex gap-2">
-                    <span className="text-primary">
-                      {i === project.architectureFlow.length - 1 ? "└──" : "├──"}
-                    </span>
-                    <span>{line}</span>
-                  </div>
-                ))}
-              </div>
+              <FlowDiagram title="Architecture / workflow" steps={project.architectureFlow} />
             </>
+          ) : null}
+
+          {tab === "How it works" ? (
+            <>
+              <Block label="Solution">{project.solution}</Block>
+              <FlowDiagram title="Step by step" steps={project.architectureFlow} />
+            </>
+          ) : null}
+
+          {tab === "Contribution" ? (
+            <Block label="My contribution">
+              <Bullets items={project.contribution} />
+            </Block>
           ) : null}
 
           {tab === "Tech Stack" ? (
@@ -761,8 +770,8 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
             </>
           ) : null}
 
-          {tab === "Future" ? (
-            <Block label="Future improvements">
+          {tab === "Lessons & Next" ? (
+            <Block label="Lessons learned / next steps">
               <Bullets items={project.future} />
             </Block>
           ) : null}

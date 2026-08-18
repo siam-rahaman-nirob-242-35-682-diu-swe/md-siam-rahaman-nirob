@@ -427,7 +427,75 @@ const projects: Project[] = [
       "Automate the whole rebuild with a provisioning script",
     ],
   },
+  {
+    tag: "Full-Stack Web",
+    state: "Academic Project · Team of 3",
+    title: "ShopNest",
+    blurb:
+      "A full-stack e-commerce marketplace covering discovery, authentication, cart, wishlist, transaction-safe checkout and protected admin capabilities.",
+    stack: [
+      "React",
+      "Vite",
+      "Node.js",
+      "Express.js",
+      "SQLite",
+      "JWT",
+      "Electron",
+    ],
+    points: [
+      "Authentication with password hashing, signed JWT access tokens and role-based access control",
+      "Product discovery, product details, cart and wishlist management",
+      "Transaction-oriented checkout: inventory validation, stock decrement, order creation and cart clearing",
+      "Profile and address management plus a protected admin dashboard",
+      "Assistant, recommendation, comparison and review-analysis interfaces isolated behind an API boundary with fallback handling",
+      "Responsive interface evidence captured across desktop, tablet and mobile layouts",
+    ],
+    source: "https://github.com/siam-rahaman-nirob-242-35-682-diu-swe/ShopNest",
+    problem:
+      "The project set out to deliver a convenient, responsive digital shopping experience: product discovery, accounts, cart/wishlist, checkout and administration usually live in disconnected demos rather than one coherent, working marketplace.",
+    architecture:
+      "A layered client-server model. React/Vite provides the responsive interface (with Electron available as a desktop wrapper), Node.js + Express exposes REST APIs and applies business rules and access control, and SQLite stores users, products, carts, orders and related marketplace data. The proposal baseline specified MySQL; the delivered transactional system uses SQLite, and the report documents the delivered implementation rather than the proposal assumptions.",
+    architectureFlow: [
+      "Web / desktop interface → REST endpoints",
+      "JWT authentication → role authorization",
+      "Controllers → services (business rules)",
+      "Services → SQLite persistence (users, products, carts, orders)",
+      "AI assistant behind an API boundary with Node-native fallback",
+    ],
+    challenge:
+      "Keeping checkout consistent — inventory validation, stock decrement, order creation and cart clearing must not drift apart — while keeping the marketplace usable even when an external AI provider is unavailable.",
+    solution:
+      "The checkout workflow was made transaction-oriented so the inventory and order steps are handled consistently, and the AI assistant was isolated behind an API boundary with graceful fallback so the core marketplace never depends on a live AI provider. Protected frontend routes and role checks prevent unauthorized UI and API access.",
+    decisions: [
+      {
+        title: "Documenting the delivered stack, not the proposal",
+        body: "The proposal specified React + Node + Express + MySQL; the delivered transactional system uses SQLite. The report records the implementation as built.",
+      },
+      {
+        title: "Transaction-oriented checkout",
+        body: "Inventory validation, stock decrement, order creation and cart clearing are handled together so order and stock state stay consistent.",
+      },
+      {
+        title: "AI behind an API boundary",
+        body: "Assistant features are bounded HTTP services with graceful Node-native fallback, so an unavailable provider cannot break the marketplace.",
+      },
+    ],
+    contribution: [
+      "Project Lead — MD. Siam Rahaman Nirob (242-35-682), Backend Developer and Frontend Instructor for the team",
+      "Owned authentication and role-based access control",
+      "Owned AI assistant integration behind the API boundary with fallback handling",
+      "Co-owned the checkout and order workflow: business transaction flow and persistence",
+    ],
+    outcome:
+      "A demonstrable end-to-end shopping workflow with more than eight implemented functional requirements, meaningful backend and database operations, and responsive UI evidence across desktop, tablet and mobile.",
+    future: [
+      "Expanded seller/admin workflows",
+      "Broader automated testing and evidence coverage",
+      "Revisit the relational backend choice as the data model grows",
+    ],
+  },
 ];
+
 
 
 const services = [

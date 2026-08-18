@@ -140,27 +140,55 @@ const BOOT: { cmd: string; out: React.ReactNode; log?: string }[] = [
   },
   {
     cmd: "focus",
-    out: <span className="text-foreground">Software Engineering + Cybersecurity</span>,
+    out: (
+      <span className="text-foreground">
+        software-engineering
+        <br />
+        cyber-security
+        <br />
+        linux-systems
+        <br />
+        embedded-automation
+      </span>
+    ),
     log: "loaded profile: kali · ubuntu · win11",
   },
   {
     cmd: "status",
     out: (
       <span className="inline-flex items-center gap-2 font-medium text-primary">
-        <span className="size-1.5 animate-pulse rounded-full bg-primary" />
-        OPEN_TO_WORK
+        <span className="size-1.5 rounded-full bg-primary" />
+        OPEN TO INTERNSHIPS &amp; JUNIOR ROLES
       </span>
     ),
     log: "listening for internships & junior roles",
   },
 ];
 
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
+
 function TerminalBoot() {
+  const reduced = usePrefersReducedMotion();
   const [step, setStep] = useState(0);
   const [typed, setTyped] = useState("");
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    if (reduced) {
+      setStep(BOOT.length);
+      setDone(true);
+      return;
+    }
     if (step >= BOOT.length) {
       setDone(true);
       return;
@@ -175,43 +203,45 @@ function TerminalBoot() {
       setTyped("");
     }, 700);
     return () => clearTimeout(t);
-  }, [typed, step]);
+  }, [typed, step, reduced]);
 
   const Caret = () => (
-    <span className="caret-blink ml-0.5 inline-block h-[1em] w-[0.55ch] translate-y-[0.12em] bg-primary" />
+    <span
+      className={`${reduced ? "" : "caret-blink "}ml-0.5 inline-block h-[1em] w-[0.55ch] translate-y-[0.12em] bg-primary`}
+    />
   );
 
   return (
-    <div className="mt-6 max-w-md rounded-xl border border-border bg-surface/60 p-4 font-mono text-[13px] leading-relaxed backdrop-blur">
+    <div className="mt-6 w-full max-w-md overflow-hidden rounded-xl border border-border bg-surface/60 p-4 font-mono text-[12px] leading-relaxed backdrop-blur sm:text-[13px]">
       <div className="mb-3 flex items-center gap-1.5">
         <span className="size-2 rounded-full bg-destructive/70" />
         <span className="size-2 rounded-full bg-signal/70" />
         <span className="size-2 rounded-full bg-primary/70" />
         <span className="ml-2 text-[10px] uppercase tracking-widest text-muted-foreground">
-          siam@portfolio
+          siam@systems
         </span>
       </div>
 
       {BOOT.slice(0, step).map((l) => (
         <div key={l.cmd} className="mb-2">
-          <div className="text-muted-foreground">
-            <span className="text-primary">~/siam</span> $ {l.cmd}
+          <div className="break-all text-muted-foreground">
+            <span className="text-primary">siam@systems</span>:~$ {l.cmd}
           </div>
-          <div className="mt-0.5">{l.out}</div>
-          {l.log ? <div className="mt-0.5 text-[10px] text-muted-foreground/60">[ok] {l.log}</div> : null}
+          <div className="mt-0.5 break-words">{l.out}</div>
+          {l.log ? <div className="mt-0.5 text-[10px] text-muted-foreground/70">[ok] {l.log}</div> : null}
         </div>
       ))}
 
       {!done && step < BOOT.length ? (
         <div className="text-muted-foreground">
-          <span className="text-primary">~/siam</span> $ {typed}
+          <span className="text-primary">siam@systems</span>:~$ {typed}
           <Caret />
         </div>
       ) : null}
 
       {done ? (
         <div className="text-muted-foreground">
-          <span className="text-primary">~/siam</span> $<Caret />
+          <span className="text-primary">siam@systems</span>:~$<Caret />
         </div>
       ) : null}
     </div>

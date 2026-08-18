@@ -11,6 +11,16 @@ import { EngineeringDashboard } from "@/components/lab/EngineeringDashboard";
 import { EngineeringLab } from "@/components/lab/EngineeringLab";
 import { CommandPalette, type PaletteAction } from "@/components/fx/CommandPalette";
 import { useTheme } from "@/hooks/use-theme";
+import { ContactForm } from "@/components/site/ContactForm";
+import {
+  SystemSnapshot,
+  AsciiDiagram,
+  EngineeringPhilosophy,
+  CapabilityStack,
+  EvidenceStrip,
+  ProofOfWork,
+  SystemMeta,
+} from "@/components/site/Sections";
 
 const SITE_URL = "https://portfolio-dynamo-07.lovable.app";
 const CV_URL = "/Muhammad-Siam-Rahaman-Nirob-CV.pdf";

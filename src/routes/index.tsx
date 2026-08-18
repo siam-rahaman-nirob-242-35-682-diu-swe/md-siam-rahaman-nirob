@@ -20,9 +20,12 @@ import {
   EvidenceStrip,
   ProofOfWork,
   SystemMeta,
+  FlowDiagram,
+  PhilosophyWorkflow,
+  SkillProofMap,
 } from "@/components/site/Sections";
 
-const SITE_URL = "https://portfolio-dynamo-07.lovable.app";
+const SITE_URL = "https://md-siam-rahaman-nirob.lovable.app";
 const CV_URL = "/Muhammad-Siam-Rahaman-Nirob-CV.pdf";
 const GITHUB_UNI = "https://github.com/siam-rahaman-nirob-242-35-682-diu-swe";
 const GITHUB = "https://github.com/Nirob682";
@@ -605,12 +608,14 @@ const certs = [
 
 const CASE_TABS = [
   "Overview",
+  "How it works",
   "Architecture",
   "Tech Stack",
+  "Contribution",
   "Engineering Decisions",
   "Challenges",
   "Solution",
-  "Future",
+  "Lessons & Next",
 ] as const;
 type CaseTab = (typeof CASE_TABS)[number];
 
@@ -639,6 +644,15 @@ function Bullets({ items }: { items: string[] }) {
 /** Glass-morphism case-study modal with tabbed deep dive. */
 function CaseStudyModal({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const [tab, setTab] = useState<CaseTab>("Overview");
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!project) return;
+    const prev = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    return () => prev?.focus?.();
+  }, [project]);
 
   useEffect(() => {
     if (project) setTab("Overview");
@@ -646,7 +660,23 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
 
   useEffect(() => {
     if (!project) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return onClose();
+      if (e.key !== "Tab") return;
+      const nodes = panelRef.current?.querySelectorAll<HTMLElement>(
+        'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])',
+      );
+      if (!nodes || nodes.length === 0) return;
+      const first = nodes[0]!;
+      const last = nodes[nodes.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -666,10 +696,11 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
       onClick={onClose}
     >
       <div
+        ref={panelRef}
         onClick={(e) => e.stopPropagation()}
-        className="glass-panel flex max-h-[88vh] w-full max-w-3xl animate-[fade-in_0.3s_ease-out] flex-col rounded-t-2xl shadow-2xl sm:rounded-2xl"
+        className="glass-panel flex max-h-[88dvh] w-full max-w-3xl animate-[fade-in_0.3s_ease-out] flex-col rounded-t-2xl shadow-2xl sm:rounded-2xl"
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border p-7 pb-5">
+        <div className="flex items-start justify-between gap-4 border-b border-border p-5 pb-4 sm:p-7 sm:pb-5">
           <div>
             <span className="mono-label">
               {project.tag} · {project.state}
@@ -677,6 +708,7 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
             <h3 className="mt-2 text-2xl font-semibold tracking-tight">{project.title}</h3>
           </div>
           <button
+            ref={closeRef}
             onClick={onClose}
             aria-label="Close case study"
             className="rounded-full border border-border p-2 text-muted-foreground transition-colors hover:text-foreground"
@@ -685,7 +717,7 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
           </button>
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto border-b border-border px-7 py-3">
+        <div className="flex gap-1.5 overflow-x-auto border-b border-border px-5 py-3 sm:px-7">
           {CASE_TABS.map((t) => (
             <button
               key={t}
@@ -694,14 +726,15 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
                 tab === t
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+              aria-pressed={tab === t}
             >
               {t}
             </button>
           ))}
         </div>
 
-        <div className="space-y-6 overflow-y-auto p-7">
+        <div className="space-y-6 overflow-y-auto overflow-x-hidden p-5 sm:p-7">
           {tab === "Overview" ? (
             <>
               <Block label="The problem">{project.problem}</Block>
@@ -718,17 +751,21 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
           {tab === "Architecture" ? (
             <>
               <Block label="How it is put together">{project.architecture}</Block>
-              <div className="rounded-xl border border-border bg-surface/50 p-5 font-mono text-xs leading-relaxed text-muted-foreground">
-                {project.architectureFlow.map((line, i) => (
-                  <div key={line} className="flex gap-2">
-                    <span className="text-primary">
-                      {i === project.architectureFlow.length - 1 ? "└──" : "├──"}
-                    </span>
-                    <span>{line}</span>
-                  </div>
-                ))}
-              </div>
+              <FlowDiagram title="Architecture / workflow" steps={project.architectureFlow} />
             </>
+          ) : null}
+
+          {tab === "How it works" ? (
+            <>
+              <Block label="Solution">{project.solution}</Block>
+              <FlowDiagram title="Step by step" steps={project.architectureFlow} />
+            </>
+          ) : null}
+
+          {tab === "Contribution" ? (
+            <Block label="My contribution">
+              <Bullets items={project.contribution} />
+            </Block>
           ) : null}
 
           {tab === "Tech Stack" ? (
@@ -761,14 +798,14 @@ function CaseStudyModal({ project, onClose }: { project: Project | null; onClose
             </>
           ) : null}
 
-          {tab === "Future" ? (
-            <Block label="Future improvements">
+          {tab === "Lessons & Next" ? (
+            <Block label="Lessons learned / next steps">
               <Bullets items={project.future} />
             </Block>
           ) : null}
         </div>
 
-        <div className="flex flex-wrap gap-3 border-t border-border p-7 pt-5">
+        <div className="flex flex-wrap gap-3 border-t border-border p-5 pt-4 sm:p-7 sm:pt-5">
           <a
             href={project.source}
             target="_blank"
@@ -873,7 +910,17 @@ function Portfolio() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
+  const openEvidence = useCallback((evidence: string) => {
+    const match = projects.find((p) => p.title === evidence);
+    if (match) {
+      setOpenProject(match);
+      return;
+    }
+    document.getElementById("experience")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
   const actions: PaletteAction[] = [
+    { group: "Navigate", label: "Go to Home", hint: "#top", run: () => go("top") },
     ...NAV.map((n) => ({
       group: "Navigate",
       label: `Go to ${n.label}`,
@@ -891,6 +938,13 @@ function Portfolio() {
         a.click();
       },
     },
+    {
+      group: "Actions",
+      label: "Open GitHub",
+      hint: "github",
+      run: () => window.open(GITHUB_UNI, "_blank"),
+    },
+    { group: "Actions", label: "Contact Me", hint: "#contact", run: () => go("contact") },
     { group: "Actions", label: "Send email", hint: EMAIL, run: () => (window.location.href = `mailto:${EMAIL}`) },
     { group: "Actions", label: "Copy email address", run: () => navigator.clipboard?.writeText(EMAIL) },
     {
@@ -926,7 +980,7 @@ function Portfolio() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh overflow-x-hidden bg-background">
       <CustomCursor />
       <SmoothScroll />
       <CommandPalette actions={actions} />
@@ -996,7 +1050,7 @@ function Portfolio() {
               </span>
               <TerminalBoot />
 
-              <h1 className="mt-4 text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+              <h1 className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
                 Muhammad Siam
                 <br />
                 <span className="text-gradient">Rahaman Nirob</span>
@@ -1177,6 +1231,11 @@ function Portfolio() {
                 <EngineeringPhilosophy />
               </Reveal>
             </div>
+            <div className="mt-6">
+              <Reveal delay={140}>
+                <PhilosophyWorkflow />
+              </Reveal>
+            </div>
 
           </div>
         </section>
@@ -1201,6 +1260,18 @@ function Portfolio() {
             <div className="mt-6">
               <Reveal delay={100}>
                 <CapabilityStack />
+              </Reveal>
+            </div>
+
+            <div className="mt-10">
+              <Reveal delay={120}>
+                <h3 className="mono-label">Skill → proof of work</h3>
+                <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+                  Each skill below links to the existing project or experience where it was used.
+                </p>
+                <div className="mt-5">
+                  <SkillProofMap onSelect={openEvidence} />
+                </div>
               </Reveal>
             </div>
 

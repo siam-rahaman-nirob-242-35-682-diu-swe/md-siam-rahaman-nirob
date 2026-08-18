@@ -1237,7 +1237,7 @@ function Portfolio() {
                     <span className="font-mono text-xs text-primary">6 Months</span>
                   </div>
                   <p className="mt-1 font-mono text-xs text-muted-foreground">
-                    GlobalTech IT · Mirpur-11, Dhaka 1216
+                    GlobalTech IT · Dhaka, Bangladesh
                   </p>
                   <ul className="mt-5 space-y-2.5">
                     {[
